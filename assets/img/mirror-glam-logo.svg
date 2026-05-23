@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 420" role="img" aria-labelledby="title desc">
+  <title id="title">Mirror Glam</title>
+  <desc id="desc">Logo circular inspirado en espejo, hojas oliva y tipografia elegante.</desc>
+  <defs>
+    <linearGradient id="rose" x1="0" x2="1">
+      <stop offset="0" stop-color="#d7a09a"/>
+      <stop offset="1" stop-color="#a96f67"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" x2="1">
+      <stop offset="0" stop-color="#d9c6a9"/>
+      <stop offset="1" stop-color="#8b7452"/>
+    </linearGradient>
+  </defs>
+  <rect width="420" height="420" fill="#fbf6ef"/>
+  <circle cx="210" cy="210" r="185" fill="#fffaf3" stroke="url(#rose)" stroke-width="4"/>
+  <circle cx="210" cy="210" r="171" fill="none" stroke="#d8c5ad" stroke-width="1.5"/>
+  <path d="M86 273c-23-50-21-107 8-151 32-49 88-76 144-68" fill="none" stroke="#c68f8b" stroke-width="6" stroke-linecap="round"/>
+  <path d="M96 263c-17-42-14-89 10-126 26-39 70-61 116-57" fill="none" stroke="#d9c6a9" stroke-width="9" opacity=".45"/>
+  <path d="M264 83c25 13 37 36 36 63-.9 36-31 67-71 69-37 2-64-20-77-51 26 22 61 22 91 5 33-19 46-53 21-86Z" fill="#8f735c" opacity=".18"/>
+  <path d="M178 157c12 20 39 26 61 17 21-9 36-28 37-49" fill="none" stroke="#8f735c" stroke-width="5" stroke-linecap="round"/>
+  <path d="M238 86c35-7 61 12 66 38-21-9-48-7-76 10-15 9-28 10-39 4 8-25 25-45 49-52Z" fill="#8f735c"/>
+  <path d="M233 93c23-1 47 9 61 25M220 107c22-5 48-1 70 12M204 122c25-10 52-12 79-3" fill="none" stroke="#fff3e8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M189 116c-27 21-39 58-24 91 8 17 7 31-2 45 29-16 44-46 37-76" fill="none" stroke="#9a735d" stroke-width="4" stroke-linecap="round"/>
+  <path d="M164 165c12 4 23 2 32-5" fill="none" stroke="#9a735d" stroke-width="3" stroke-linecap="round"/>
+  <path d="M160 190c9 6 20 8 31 4" fill="none" stroke="#9a735d" stroke-width="3" stroke-linecap="round"/>
+  <text x="75" y="284" font-family="Georgia, serif" font-size="86" fill="url(#rose)" font-style="italic">Mirror</text>
+  <text x="122" y="342" font-family="Georgia, serif" font-size="75" fill="#788260">Glam</text>
+  <text x="126" y="368" font-family="Arial, sans-serif" font-size="11" letter-spacing="8" fill="#8b7452">SISTEMA DE GESTION</text>
+  <path d="M62 286c-24-54-25-112-1-162m0 0c9 20 8 38-1 54m1-54c17 15 23 33 18 54m-19 0c-14 17-25 35-30 55m30-55c17 11 25 29 25 50M333 316c20-17 38-38 51-63m-51 63c22 1 40-8 54-26m-54 26c3 18-2 35-13 51" fill="none" stroke="#788260" stroke-width="5" stroke-linecap="round"/>
+  <path d="M335 135l9 18 18 9-18 9-9 18-9-18-18-9 18-9 9-18Zm43 24l5 10 10 5-10 5-5 10-5-10-10-5 10-5 5-10Z" fill="#c68f8b"/>
+  <g fill="none" stroke="#c68f8b" stroke-width="4" stroke-linecap="round">
+    <rect x="282" y="308" width="38" height="36" rx="5"/>
+    <path d="M282 320h38M292 303v10M310 303v10"/>
+    <path d="M292 329h4M305 329h4M292 338h4M305 338h4"/>
+  </g>
+</svg>
