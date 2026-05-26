@@ -6,6 +6,20 @@
 
 declare(strict_types=1);
 
+function db_config(): array
+{
+    static $config = null;
+
+    if (is_array($config)) {
+        return $config;
+    }
+
+    $configPath = __DIR__ . '/config.php';
+    $config = file_exists($configPath) ? require $configPath : [];
+
+    return $config;
+}
+
 function db(): PDO
 {
     static $pdo = null;
@@ -14,8 +28,7 @@ function db(): PDO
         return $pdo;
     }
 
-    $configPath = __DIR__ . '/config.php';
-    $config = file_exists($configPath) ? require $configPath : [];
+    $config = db_config();
 
     $host = $config['host'] ?? getenv('DB_HOST') ?: 'localhost';
     $database = $config['database'] ?? getenv('DB_DATABASE') ?: 'mirror_glam';

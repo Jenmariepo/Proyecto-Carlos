@@ -53,7 +53,25 @@ Luego importa desde las vistas/datos. Los triggers y procedimientos son utiles, 
 
 ## Para n8n
 
-n8n debe leer registros pendientes desde:
+n8n puede leer recordatorios listos desde el endpoint PHP:
+
+```text
+GET /controllers/api.php?resource=n8n&action=pendientes&canal=WhatsApp
+```
+
+Usa el header privado configurado en `database/config.php`:
+
+```text
+X-MirrorGlam-N8N-Secret: tu-token
+```
+
+Despues de enviar el mensaje, n8n debe marcar el resultado:
+
+```text
+POST /controllers/api.php?resource=n8n&action=resultado
+```
+
+Tambien puede consultar directamente estas tablas si prefieres usar nodos MySQL:
 
 ```sql
 automatizacion_eventos

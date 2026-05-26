@@ -550,6 +550,71 @@ final class GenericCrudController
         $precio = (float)$this->db->query("SELECT precio FROM servicios WHERE id = {$servicioId}")->fetchColumn();
         $this->db->prepare('INSERT INTO detalle_citas (cita_id, servicio_id, precio) VALUES (:cita_id, :servicio_id, :precio)')
             ->execute(['cita_id' => $id, 'servicio_id' => $servicioId, 'precio' => $precio]);
+
+        $this->syncCitaWhatsappReminder((int)$id);
+    }
+
+    private function syncCitaWhatsappReminder(int $citaId): void
+    {
+        $stmt = $this->db->prepare(
+            'SELECT c.id,
+                    c.fecha,
+                    c.hora_inicio,
+                    c.estado,
+                    cl.id AS cliente_id,
+                    cl.nombre AS cliente,
+                    cl.telefono,
+                    cl.acepta_whatsapp,
+                    e.id AS empleado_id,
+                    e.nombre AS empleado,
+                    COALESCE(s.nombre, "tu servicio") AS servicio
+             FROM citas c
+             JOIN clientes cl ON cl.id = c.cliente_id
+             JOIN empleados e ON e.id = c.empleado_id
+             LEFT JOIN detalle_citas dc ON dc.cita_id = c.id
+             LEFT JOIN servicios s ON s.id = dc.servicio_id
+             WHERE c.id=:id
+             LIMIT 1'
+        );
+        $stmt->execute(['id' => $citaId]);
+        $cita = $stmt->fetch();
+        if (!$cita) return;
+
+        $this->db->prepare('DELETE FROM recordatorios WHERE cita_id=:id AND canal="WhatsApp" AND estado="Pendiente"')
+            ->execute(['id' => $citaId]);
+
+        if (in_array($cita['estado'], ['Cancelado', 'Completado', 'No asistio'], true)) return;
+        if ((int)$cita['acepta_whatsapp'] !== 1) return;
+        if (trim((string)$cita['telefono']) === '' || $cita['telefono'] === 'Sin telefono') return;
+
+        $appointmentAt = new DateTime($cita['fecha'] . ' ' . $cita['hora_inicio']);
+        $scheduledAt = (clone $appointmentAt)->modify('-1 day');
+        if ($scheduledAt < new DateTime()) {
+            $scheduledAt = new DateTime('+2 minutes');
+        }
+
+        $mensaje = sprintf(
+            'Hola %s, te recordamos tu cita en Mirror Glam para %s el %s a las %s con %s. Responde CONFIRMAR para confirmar o CANCELAR para cancelar.',
+            $cita['cliente'],
+            $cita['servicio'],
+            $appointmentAt->format('d/m/Y'),
+            $appointmentAt->format('h:i A'),
+            $cita['empleado']
+        );
+
+        $this->db->prepare(
+            'INSERT INTO recordatorios
+               (cita_id, cliente_id, empleado_id, tipo, canal, destinatario, mensaje, programado_para, estado)
+             VALUES
+               (:cita_id, :cliente_id, :empleado_id, "Cita", "WhatsApp", :destinatario, :mensaje, :programado_para, "Pendiente")'
+        )->execute([
+            'cita_id' => $citaId,
+            'cliente_id' => $cita['cliente_id'],
+            'empleado_id' => $cita['empleado_id'],
+            'destinatario' => $cita['telefono'],
+            'mensaje' => $mensaje,
+            'programado_para' => $scheduledAt->format('Y-m-d H:i:s'),
+        ]);
     }
 
     private function findOrCreateCliente(string $nombre, string $telefono = ''): int

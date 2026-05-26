@@ -1,4 +1,5 @@
 database/config.php
+backups/
 tools/
 vendor/
 node_modules/

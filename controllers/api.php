@@ -27,6 +27,12 @@ try {
         exit;
     }
 
+    if ($resource === 'n8n') {
+        require_once __DIR__ . '/N8nController.php';
+        echo json_encode((new N8nController())->handle($method));
+        exit;
+    }
+
     switch ($resource) {
         case 'clientes':
         case 'empleados':
