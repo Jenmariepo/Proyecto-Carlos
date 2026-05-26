@@ -1,0 +1,181 @@
+{
+  "name": "Mirror Glam - Recordatorios WhatsApp",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 10
+            }
+          ]
+        }
+      },
+      "id": "schedule-recordatorios",
+      "name": "Cada 10 minutos",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "http://localhost:8000/controllers/api.php?resource=n8n&action=pendientes&canal=WhatsApp",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-MirrorGlam-N8N-Secret",
+              "value": "mirror-glam-n8n-2026"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "leer-pendientes",
+      "name": "Leer pendientes Mirror Glam",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        500,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const reminders = $json.data?.recordatorios || [];\nreturn reminders.map((item) => ({ json: item }));"
+      },
+      "id": "separar-recordatorios",
+      "name": "Separar recordatorios",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        760,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v20.0/PEGA_AQUI_PHONE_NUMBER_ID/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer PEGA_AQUI_ACCESS_TOKEN"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{$json.telefono_whatsapp}}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"preview_url\": false,\n    \"body\": \"{{$json.mensaje}}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "enviar-whatsapp",
+      "name": "Enviar WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1020,
+        300
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:8000/controllers/api.php?resource=n8n&action=resultado",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-MirrorGlam-N8N-Secret",
+              "value": "mirror-glam-n8n-2026"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"recordatorio_id\": {{$node[\"Separar recordatorios\"].json.id}},\n  \"ok\": {{ !$json.error }},\n  \"proveedor\": \"WhatsApp Cloud API\",\n  \"proveedor_message_id\": \"{{$json.messages?.[0]?.id || ''}}\",\n  \"error\": \"{{$json.error?.message || ''}}\",\n  \"workflow\": \"mirror-glam-recordatorios-whatsapp\"\n}",
+        "options": {}
+      },
+      "id": "registrar-resultado",
+      "name": "Registrar resultado Mirror Glam",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1280,
+        300
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Cada 10 minutos": {
+      "main": [
+        [
+          {
+            "node": "Leer pendientes Mirror Glam",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer pendientes Mirror Glam": {
+      "main": [
+        [
+          {
+            "node": "Separar recordatorios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Separar recordatorios": {
+      "main": [
+        [
+          {
+            "node": "Enviar WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Registrar resultado Mirror Glam",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "mirror-glam-whatsapp-template",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "tags": []
+}

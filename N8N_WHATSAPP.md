@@ -2,6 +2,26 @@
 
 Esta integracion deja a Mirror Glam listo para que n8n envie mensajes automaticos por WhatsApp usando el proveedor que prefieras: WhatsApp Cloud API, Twilio, Evolution API, WPPConnect u otro.
 
+## Importante sobre costos
+
+No tienes que pagar para probar ahora.
+
+Opciones:
+
+1. Prueba gratis oficial:
+   - Usa el numero de prueba de Meta WhatsApp Cloud API.
+   - Usa el token temporal que Meta entrega en `WhatsApp > API Setup`.
+   - Solo puedes escribir a numeros agregados como destinatarios de prueba.
+
+2. Simulacion sin enviar WhatsApp real:
+   - n8n lee los recordatorios de Mirror Glam.
+   - En vez de llamar a WhatsApp, marca el mensaje como enviado con proveedor `Simulacion n8n`.
+   - Sirve para probar que el sistema crea recordatorios, n8n los lee y Mirror Glam registra el historial.
+
+3. Produccion real:
+   - Requiere WhatsApp Cloud API, Twilio, Evolution API u otro proveedor.
+   - En la via oficial de Meta, el token no se compra como tal, pero los mensajes/conversaciones de negocio pueden tener costos segun pais y categoria.
+
 ## 1. Token privado
 
 En tu archivo local `database/config.php` debe existir:
@@ -126,3 +146,26 @@ https://tudominio.com/controllers/api.php?resource=n8n&action=pendientes
 ```
 
 No compartas el token de n8n en GitHub ni en capturas.
+
+## 8. Prueba sin pagar y sin token de Meta
+
+Si todavia no tienes token de WhatsApp, puedes probar todo el flujo asi:
+
+1. En n8n importa el workflow.
+2. Desactiva o elimina temporalmente el nodo `Enviar WhatsApp`.
+3. Conecta `Separar recordatorios` directo con `Registrar resultado Mirror Glam`.
+4. En el nodo `Registrar resultado Mirror Glam`, usa este body:
+
+```json
+{
+  "recordatorio_id": "{{$json.id}}",
+  "ok": true,
+  "proveedor": "Simulacion n8n",
+  "proveedor_message_id": "simulado-{{$json.id}}",
+  "workflow": "mirror-glam-recordatorios-whatsapp"
+}
+```
+
+Con eso veras que Mirror Glam marca el recordatorio como enviado y guarda el historial en `mensajes`, sin enviar nada real.
+
+Cuando ya tengas el token temporal de Meta, vuelves a conectar el nodo `Enviar WhatsApp`.
